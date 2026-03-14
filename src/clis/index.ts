@@ -17,3 +17,6 @@ import './github/search.js';
 
 // zhihu
 import './zhihu/question.js';
+
+// xiaohongshu
+import './xiaohongshu/search.js';
