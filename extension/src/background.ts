@@ -144,8 +144,11 @@ function resetWindowIdleTimer(workspace: string): void {
   }, WINDOW_IDLE_TIMEOUT);
 }
 
-/** Get or create the dedicated automation window. */
-async function getAutomationWindow(workspace: string): Promise<number> {
+/** Get or create the dedicated automation window.
+ *  @param initialUrl — if provided (http/https), used as the initial page instead of about:blank.
+ *    This avoids an extra blank-page→target-domain navigation on first command.
+ */
+async function getAutomationWindow(workspace: string, initialUrl?: string): Promise<number> {
   // Check if our window is still alive
   const existing = automationSessions.get(workspace);
   if (existing) {
@@ -158,12 +161,13 @@ async function getAutomationWindow(workspace: string): Promise<number> {
     }
   }
 
-  // Create a new window with a data: URI that New Tab Override extensions cannot intercept.
-  // Using about:blank would be hijacked by extensions like "New Tab Override".
+  // Use the target URL directly if it's a safe navigation URL, otherwise fall back to about:blank.
+  const startUrl = (initialUrl && isSafeNavigationUrl(initialUrl)) ? initialUrl : BLANK_PAGE;
+
   // Note: Do NOT set `state` parameter here. Chrome 146+ rejects 'normal' as an invalid
   // state value for windows.create(). The window defaults to 'normal' state anyway.
   const win = await chrome.windows.create({
-    url: BLANK_PAGE,
+    url: startUrl,
     focused: false,
     width: 1280,
     height: 900,
@@ -175,9 +179,9 @@ async function getAutomationWindow(workspace: string): Promise<number> {
     idleDeadlineAt: Date.now() + WINDOW_IDLE_TIMEOUT,
   };
   automationSessions.set(workspace, session);
-  console.log(`[opencli] Created automation window ${session.windowId} (${workspace})`);
+  console.log(`[opencli] Created automation window ${session.windowId} (${workspace}, start=${startUrl})`);
   resetWindowIdleTimer(workspace);
-  // Brief delay to let Chrome load the initial data: URI tab
+  // Brief delay to let Chrome load the initial tab
   await new Promise(resolve => setTimeout(resolve, 200));
   return session.windowId;
 }
@@ -317,8 +321,9 @@ function setWorkspaceSession(workspace: string, session: Pick<AutomationSession,
  * Resolve target tab in the automation window.
  * If explicit tabId is given, use that directly.
  * Otherwise, find or create a tab in the dedicated automation window.
+ * @param initialUrl — passed to getAutomationWindow for first-time window creation.
  */
-async function resolveTabId(tabId: number | undefined, workspace: string): Promise<number> {
+async function resolveTabId(tabId: number | undefined, workspace: string, initialUrl?: string): Promise<number> {
   // Even when an explicit tabId is provided, validate it is still debuggable.
   // This prevents issues when extensions hijack the tab URL to chrome-extension://
   // or when the tab has been closed by the user.
@@ -341,7 +346,7 @@ async function resolveTabId(tabId: number | undefined, workspace: string): Promi
   }
 
   // Get (or create) the automation window
-  const windowId = await getAutomationWindow(workspace);
+  const windowId = await getAutomationWindow(workspace, initialUrl);
 
   // Prefer an existing debuggable tab
   const tabs = await chrome.tabs.query({ windowId });
@@ -402,7 +407,8 @@ async function handleNavigate(cmd: Command, workspace: string): Promise<Result> 
   if (!isSafeNavigationUrl(cmd.url)) {
     return { id: cmd.id, ok: false, error: 'Blocked URL scheme -- only http:// and https:// are allowed' };
   }
-  const tabId = await resolveTabId(cmd.tabId, workspace);
+  // Pass target URL so that first-time window creation can start on the right domain
+  const tabId = await resolveTabId(cmd.tabId, workspace, cmd.url);
 
   const beforeTab = await chrome.tabs.get(tabId);
   const beforeNormalized = normalizeUrlForComparison(beforeTab.url);
