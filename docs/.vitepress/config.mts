@@ -31,6 +31,7 @@ export default defineConfig({
                 { text: 'Installation', link: '/guide/installation' },
                 { text: 'Comparison', link: '/comparison' },
                 { text: 'Browser Bridge', link: '/guide/browser-bridge' },
+                { text: 'Remote Orchestration', link: '/guide/remote-orchestration' },
                 { text: 'Troubleshooting', link: '/guide/troubleshooting' },
                 { text: 'Add an Electron App CLI', link: '/guide/electron-app-cli' },
                 { text: 'Extending OpenCLI', link: '/guide/extending-opencli' },
