@@ -8899,6 +8899,85 @@
     "navigateBefore": "https://www.facebook.com"
   },
   {
+    "site": "flathub",
+    "name": "app",
+    "description": "Full Flathub appstream metadata for an app id (license, categories, latest release)",
+    "access": "read",
+    "domain": "flathub.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "appId",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "AppStream id (e.g. \"org.mozilla.firefox\", \"org.gnome.Calculator\")"
+      }
+    ],
+    "columns": [
+      "appId",
+      "name",
+      "summary",
+      "developer",
+      "license",
+      "isFreeLicense",
+      "isEol",
+      "categories",
+      "keywords",
+      "latestVersion",
+      "latestReleaseDate",
+      "homepage",
+      "bugtracker",
+      "donation",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "flathub/app.js",
+    "sourceFile": "flathub/app.js"
+  },
+  {
+    "site": "flathub",
+    "name": "search",
+    "description": "Search Flathub apps by keyword",
+    "access": "read",
+    "domain": "flathub.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "query",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Search keyword"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 25,
+        "required": false,
+        "help": "Max apps (1-100)"
+      }
+    ],
+    "columns": [
+      "rank",
+      "appId",
+      "name",
+      "summary",
+      "developer",
+      "license",
+      "isFreeLicense",
+      "mainCategories",
+      "installsLastMonth",
+      "updatedAt",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "flathub/search.js",
+    "sourceFile": "flathub/search.js"
+  },
+  {
     "site": "gemini",
     "name": "ask",
     "description": "Send a prompt to Gemini and return only the assistant response",
@@ -12985,6 +13064,86 @@
     "sourceFile": "lesswrong/user-posts.js"
   },
   {
+    "site": "lichess",
+    "name": "top",
+    "description": "Top-N Lichess leaderboard for a perf type (bullet/blitz/rapid/classical/...)",
+    "access": "read",
+    "domain": "lichess.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "perf",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Perf type (bullet, blitz, rapid, classical, ultraBullet, chess960, ...)"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 10,
+        "required": false,
+        "help": "Top-N rows (1-200)"
+      }
+    ],
+    "columns": [
+      "rank",
+      "username",
+      "id",
+      "title",
+      "rating",
+      "progress",
+      "patron",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "lichess/top.js",
+    "sourceFile": "lichess/top.js"
+  },
+  {
+    "site": "lichess",
+    "name": "user",
+    "description": "Fetch a Lichess player profile by username (rating, perfs, counts)",
+    "access": "read",
+    "domain": "lichess.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "username",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Lichess username (case-insensitive)"
+      }
+    ],
+    "columns": [
+      "username",
+      "id",
+      "title",
+      "patron",
+      "online",
+      "tosViolation",
+      "createdAt",
+      "seenAt",
+      "gamesAll",
+      "gamesWin",
+      "gamesLoss",
+      "gamesDraw",
+      "topPerfName",
+      "topPerfRating",
+      "topPerfGames",
+      "fideRating",
+      "country",
+      "bio",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "lichess/user.js",
+    "sourceFile": "lichess/user.js"
+  },
+  {
     "site": "linkedin",
     "name": "search",
     "description": "Search LinkedIn jobs",
@@ -15510,6 +15669,89 @@
     "sourceFile": "npm/search.js"
   },
   {
+    "site": "nuget",
+    "name": "package",
+    "description": "Full NuGet package version history (catalogEntry per release)",
+    "access": "read",
+    "domain": "api.nuget.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "id",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "NuGet package id (e.g. \"Newtonsoft.Json\", case-insensitive)"
+      }
+    ],
+    "columns": [
+      "rank",
+      "id",
+      "version",
+      "title",
+      "authors",
+      "tags",
+      "language",
+      "licenseExpression",
+      "projectUrl",
+      "published",
+      "listed",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "nuget/package.js",
+    "sourceFile": "nuget/package.js"
+  },
+  {
+    "site": "nuget",
+    "name": "search",
+    "description": "Search NuGet packages by keyword",
+    "access": "read",
+    "domain": "api.nuget.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "query",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Search keyword"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 20,
+        "required": false,
+        "help": "Max packages (1-1000)"
+      },
+      {
+        "name": "prerelease",
+        "type": "boolean",
+        "default": false,
+        "required": false,
+        "help": "Include prerelease versions"
+      }
+    ],
+    "columns": [
+      "rank",
+      "id",
+      "version",
+      "title",
+      "description",
+      "authors",
+      "tags",
+      "totalDownloads",
+      "verified",
+      "projectUrl",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "nuget/search.js",
+    "sourceFile": "nuget/search.js"
+  },
+  {
     "site": "nvd",
     "name": "cve",
     "description": "NIST NVD CVE detail (description, CVSS, CWE, KEV flag)",
@@ -15542,6 +15784,82 @@
     "type": "js",
     "modulePath": "nvd/cve.js",
     "sourceFile": "nvd/cve.js"
+  },
+  {
+    "site": "oeis",
+    "name": "search",
+    "description": "Search OEIS sequences by keyword or numeric pattern",
+    "access": "read",
+    "domain": "oeis.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "query",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Search keyword or comma-separated terms (e.g. \"fibonacci\", \"1,1,2,3,5,8\")"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 10,
+        "required": false,
+        "help": "Max sequences (1-100)"
+      }
+    ],
+    "columns": [
+      "rank",
+      "id",
+      "name",
+      "keywords",
+      "preview",
+      "author",
+      "created",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "oeis/search.js",
+    "sourceFile": "oeis/search.js"
+  },
+  {
+    "site": "oeis",
+    "name": "sequence",
+    "description": "Full OEIS sequence detail by A-number (terms, name, keywords, formula counts)",
+    "access": "read",
+    "domain": "oeis.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "id",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "OEIS sequence id (e.g. \"A000045\" for Fibonacci)"
+      }
+    ],
+    "columns": [
+      "id",
+      "name",
+      "keywords",
+      "preview",
+      "termCount",
+      "offset",
+      "author",
+      "created",
+      "revision",
+      "commentCount",
+      "formulaCount",
+      "referenceCount",
+      "xrefCount",
+      "linkCount",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "oeis/sequence.js",
+    "sourceFile": "oeis/sequence.js"
   },
   {
     "site": "ones",
@@ -18279,6 +18597,108 @@
     "modulePath": "reddit/user-posts.js",
     "sourceFile": "reddit/user-posts.js",
     "navigateBefore": "https://reddit.com"
+  },
+  {
+    "site": "rest-countries",
+    "name": "country",
+    "description": "Look up countries by name (common / official, substring match)",
+    "access": "read",
+    "domain": "restcountries.com",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "name",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Country name (e.g. \"japan\", \"united kingdom\")"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 25,
+        "required": false,
+        "help": "Max rows (1-250)"
+      }
+    ],
+    "columns": [
+      "rank",
+      "commonName",
+      "officialName",
+      "cca2",
+      "cca3",
+      "ccn3",
+      "capital",
+      "region",
+      "subregion",
+      "population",
+      "area",
+      "languages",
+      "currencies",
+      "latitude",
+      "longitude",
+      "timezones",
+      "independent",
+      "unMember",
+      "landlocked",
+      "flag",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "rest-countries/country.js",
+    "sourceFile": "rest-countries/country.js"
+  },
+  {
+    "site": "rest-countries",
+    "name": "region",
+    "description": "List countries in a region (africa / americas / asia / europe / oceania / antarctic)",
+    "access": "read",
+    "domain": "restcountries.com",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "region",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Region name (case-insensitive)"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 250,
+        "required": false,
+        "help": "Max rows (1-250)"
+      }
+    ],
+    "columns": [
+      "rank",
+      "commonName",
+      "officialName",
+      "cca2",
+      "cca3",
+      "ccn3",
+      "capital",
+      "region",
+      "subregion",
+      "population",
+      "area",
+      "languages",
+      "currencies",
+      "latitude",
+      "longitude",
+      "timezones",
+      "independent",
+      "unMember",
+      "landlocked",
+      "flag",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "rest-countries/region.js",
+    "sourceFile": "rest-countries/region.js"
   },
   {
     "site": "reuters",
@@ -22842,6 +23262,90 @@
     "modulePath": "weread/shelf.js",
     "sourceFile": "weread/shelf.js",
     "navigateBefore": "https://weread.qq.com"
+  },
+  {
+    "site": "wikidata",
+    "name": "entity",
+    "description": "Fetch a Wikidata entity by Q/P/L id (label, description, aliases, claim summary)",
+    "access": "read",
+    "domain": "www.wikidata.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "id",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Entity id (e.g. Q937 = Albert Einstein, P31 = instance of)"
+      },
+      {
+        "name": "language",
+        "type": "str",
+        "default": "en",
+        "required": false,
+        "help": "Display language (ISO 639, falls back to English when missing)"
+      }
+    ],
+    "columns": [
+      "qid",
+      "type",
+      "label",
+      "description",
+      "aliases",
+      "claimPropertyCount",
+      "sitelinkCount",
+      "enwikiTitle",
+      "modified",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "wikidata/entity.js",
+    "sourceFile": "wikidata/entity.js"
+  },
+  {
+    "site": "wikidata",
+    "name": "search",
+    "description": "Search Wikidata items by keyword (returns Q-IDs)",
+    "access": "read",
+    "domain": "www.wikidata.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "query",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Search keyword (label / alias)"
+      },
+      {
+        "name": "language",
+        "type": "str",
+        "default": "en",
+        "required": false,
+        "help": "Search & display language (ISO 639, e.g. en, fr, zh)"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 20,
+        "required": false,
+        "help": "Max items (1-50)"
+      }
+    ],
+    "columns": [
+      "rank",
+      "qid",
+      "label",
+      "description",
+      "matchType",
+      "matchText",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "wikidata/search.js",
+    "sourceFile": "wikidata/search.js"
   },
   {
     "site": "wikipedia",

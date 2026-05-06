@@ -128,6 +128,12 @@ Run `opencli list` for the live registry.
 | **[goproxy](./browser/goproxy.md)**               | `module` `versions`                                                                                                                            | 🌐 Public    |
 | **[tvmaze](./browser/tvmaze.md)**                 | `search` `show`                                                                                                                                | 🌐 Public    |
 | **[rfc](./browser/rfc.md)**                       | `rfc`                                                                                                                                          | 🌐 Public    |
+| **[wikidata](./browser/wikidata.md)**             | `search` `entity`                                                                                                                              | 🌐 Public    |
+| **[lichess](./browser/lichess.md)**               | `user` `top`                                                                                                                                   | 🌐 Public    |
+| **[rest-countries](./browser/rest-countries.md)** | `country` `region`                                                                                                                             | 🌐 Public    |
+| **[nuget](./browser/nuget.md)**                   | `search` `package`                                                                                                                             | 🌐 Public    |
+| **[flathub](./browser/flathub.md)**               | `search` `app`                                                                                                                                 | 🌐 Public    |
+| **[oeis](./browser/oeis.md)**                     | `search` `sequence`                                                                                                                            | 🌐 Public    |
 
 ## Desktop Adapters
 
