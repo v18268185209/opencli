@@ -6471,6 +6471,76 @@
     "navigateBefore": true
   },
   {
+    "site": "dockerhub",
+    "name": "image",
+    "description": "Fetch a Docker Hub repository's public metadata (stars, pulls, last updated, status)",
+    "access": "read",
+    "domain": "hub.docker.com",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "image",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Image name (e.g. \"nginx\", \"library/nginx\", \"bitnami/redis\")"
+      }
+    ],
+    "columns": [
+      "image",
+      "official",
+      "stars",
+      "pulls",
+      "description",
+      "lastUpdated",
+      "lastModified",
+      "registered",
+      "status",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "dockerhub/image.js",
+    "sourceFile": "dockerhub/image.js"
+  },
+  {
+    "site": "dockerhub",
+    "name": "search",
+    "description": "Search Docker Hub repositories by keyword",
+    "access": "read",
+    "domain": "hub.docker.com",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "query",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Search keyword (e.g. \"nginx\", \"bitnami redis\")"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 25,
+        "required": false,
+        "help": "Max repositories (1-100, single Docker Hub page)"
+      }
+    ],
+    "columns": [
+      "rank",
+      "image",
+      "official",
+      "stars",
+      "pulls",
+      "description",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "dockerhub/search.js",
+    "sourceFile": "dockerhub/search.js"
+  },
+  {
     "site": "douban",
     "name": "book-hot",
     "description": "豆瓣图书热门榜单",
@@ -9998,6 +10068,117 @@
     "type": "js",
     "modulePath": "hf/top.js",
     "sourceFile": "hf/top.js"
+  },
+  {
+    "site": "homebrew",
+    "name": "cask",
+    "description": "Fetch a Homebrew cask's metadata (version, homepage, deprecation, download URL)",
+    "access": "read",
+    "domain": "formulae.brew.sh",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "token",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Cask token (e.g. \"firefox\", \"visual-studio-code\", \"google-chrome\")"
+      }
+    ],
+    "columns": [
+      "cask",
+      "tap",
+      "name",
+      "version",
+      "description",
+      "homepage",
+      "deprecated",
+      "disabled",
+      "download",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "homebrew/cask.js",
+    "sourceFile": "homebrew/cask.js"
+  },
+  {
+    "site": "homebrew",
+    "name": "formula",
+    "description": "Fetch a Homebrew formula's metadata (version, license, deps, deprecation, source)",
+    "access": "read",
+    "domain": "formulae.brew.sh",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "name",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Formula name (e.g. \"wget\", \"gcc@13\", \"imagemagick\")"
+      }
+    ],
+    "columns": [
+      "formula",
+      "tap",
+      "version",
+      "license",
+      "description",
+      "homepage",
+      "dependencies",
+      "deprecated",
+      "disabled",
+      "source",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "homebrew/formula.js",
+    "sourceFile": "homebrew/formula.js"
+  },
+  {
+    "site": "homebrew",
+    "name": "popular",
+    "description": "List most-installed Homebrew formulae or casks (Homebrew's analytics ranking)",
+    "access": "read",
+    "domain": "formulae.brew.sh",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "type",
+        "type": "str",
+        "default": "formula",
+        "required": false,
+        "help": "Package type (formula / cask)"
+      },
+      {
+        "name": "window",
+        "type": "str",
+        "default": "30d",
+        "required": false,
+        "help": "Time window (30d / 90d / 365d)"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 30,
+        "required": false,
+        "help": "Max rows (1-500)"
+      }
+    ],
+    "columns": [
+      "rank",
+      "token",
+      "type",
+      "installs",
+      "percent",
+      "window",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "homebrew/popular.js",
+    "sourceFile": "homebrew/popular.js"
   },
   {
     "site": "hupu",
@@ -13554,6 +13735,83 @@
     "navigateBefore": "https://maimai.cn"
   },
   {
+    "site": "maven",
+    "name": "artifact",
+    "description": "Fetch a Maven Central artifact's version history (groupId:artifactId[:version])",
+    "access": "read",
+    "domain": "search.maven.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "coordinate",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Maven coord \"groupId:artifactId\" or \"groupId:artifactId:version\""
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 20,
+        "required": false,
+        "help": "Max versions (1-200, ignored when version is pinned)"
+      }
+    ],
+    "columns": [
+      "groupId",
+      "artifactId",
+      "version",
+      "packaging",
+      "publishedAt",
+      "tags",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "maven/artifact.js",
+    "sourceFile": "maven/artifact.js"
+  },
+  {
+    "site": "maven",
+    "name": "search",
+    "description": "Search Maven Central by keyword (artifact name, groupId, tag)",
+    "access": "read",
+    "domain": "search.maven.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "query",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Search keyword (e.g. \"jackson\", \"guava\", \"ai.koog\")"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 30,
+        "required": false,
+        "help": "Max artifacts (1-200)"
+      }
+    ],
+    "columns": [
+      "rank",
+      "coordinate",
+      "groupId",
+      "artifactId",
+      "latestVersion",
+      "packaging",
+      "versions",
+      "lastPublished",
+      "repository",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "maven/search.js",
+    "sourceFile": "maven/search.js"
+  },
+  {
     "site": "mdn",
     "name": "search",
     "description": "Search MDN Web Docs by keyword",
@@ -15402,6 +15660,85 @@
     "navigateBefore": false
   },
   {
+    "site": "openalex",
+    "name": "search",
+    "description": "Search OpenAlex Works (papers, books, preprints) by keyword",
+    "access": "read",
+    "domain": "api.openalex.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "query",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Search text (e.g. \"transformers\", \"open access scholarly\")"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 20,
+        "required": false,
+        "help": "Max works (1-200, single OpenAlex page)"
+      }
+    ],
+    "columns": [
+      "rank",
+      "id",
+      "title",
+      "year",
+      "citations",
+      "firstAuthor",
+      "venue",
+      "openAccess",
+      "type",
+      "doi",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "openalex/search.js",
+    "sourceFile": "openalex/search.js"
+  },
+  {
+    "site": "openalex",
+    "name": "work",
+    "description": "Fetch a single OpenAlex Work (paper / preprint / book) — metadata + abstract",
+    "access": "read",
+    "domain": "api.openalex.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "id",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "OpenAlex Work id (\"W2741809807\"), DOI (\"10.7717/peerj.4375\"), or full URL"
+      }
+    ],
+    "columns": [
+      "id",
+      "title",
+      "type",
+      "year",
+      "date",
+      "language",
+      "authors",
+      "venue",
+      "citations",
+      "openAccess",
+      "openAccessUrl",
+      "referencedCount",
+      "doi",
+      "abstract",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "openalex/work.js",
+    "sourceFile": "openalex/work.js"
+  },
+  {
     "site": "openreview",
     "name": "paper",
     "description": "Show full metadata for a single OpenReview paper",
@@ -15552,6 +15889,78 @@
     "type": "js",
     "modulePath": "openreview/venue.js",
     "sourceFile": "openreview/venue.js"
+  },
+  {
+    "site": "packagist",
+    "name": "package",
+    "description": "Fetch a Packagist package's metadata (version, downloads, license, repo, GitHub stars)",
+    "access": "read",
+    "domain": "packagist.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "name",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Composer package \"<vendor>/<package>\" (e.g. \"symfony/console\", \"monolog/monolog\")"
+      }
+    ],
+    "columns": [
+      "package",
+      "version",
+      "releasedAt",
+      "license",
+      "description",
+      "repository",
+      "githubStars",
+      "favers",
+      "downloads",
+      "monthlyDownloads",
+      "dailyDownloads",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "packagist/package.js",
+    "sourceFile": "packagist/package.js"
+  },
+  {
+    "site": "packagist",
+    "name": "search",
+    "description": "Search Packagist (PHP / Composer) packages by keyword",
+    "access": "read",
+    "domain": "packagist.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "query",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Search keyword (e.g. \"symfony\", \"laravel http\")"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 30,
+        "required": false,
+        "help": "Max packages (1-100, single Packagist page)"
+      }
+    ],
+    "columns": [
+      "rank",
+      "package",
+      "description",
+      "downloads",
+      "favers",
+      "repository",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "packagist/search.js",
+    "sourceFile": "packagist/search.js"
   },
   {
     "site": "paperreview",
@@ -17642,6 +18051,79 @@
     "modulePath": "reuters/search.js",
     "sourceFile": "reuters/search.js",
     "navigateBefore": "https://www.reuters.com"
+  },
+  {
+    "site": "rubygems",
+    "name": "gem",
+    "description": "Fetch a RubyGems.org gem's metadata (version, downloads, license, links)",
+    "access": "read",
+    "domain": "rubygems.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "name",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Gem name (e.g. \"rails\", \"sidekiq\")"
+      }
+    ],
+    "columns": [
+      "gem",
+      "version",
+      "releasedAt",
+      "downloads",
+      "versionDownloads",
+      "license",
+      "authors",
+      "homepage",
+      "source",
+      "bugs",
+      "info",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "rubygems/gem.js",
+    "sourceFile": "rubygems/gem.js"
+  },
+  {
+    "site": "rubygems",
+    "name": "search",
+    "description": "Search RubyGems.org gems by keyword",
+    "access": "read",
+    "domain": "rubygems.org",
+    "strategy": "public",
+    "browser": false,
+    "args": [
+      {
+        "name": "query",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Search keyword (e.g. \"rails\", \"redis\")"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 30,
+        "required": false,
+        "help": "Max gems (1-100, single RubyGems page)"
+      }
+    ],
+    "columns": [
+      "rank",
+      "gem",
+      "version",
+      "downloads",
+      "license",
+      "authors",
+      "info",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "rubygems/search.js",
+    "sourceFile": "rubygems/search.js"
   },
   {
     "site": "sinablog",

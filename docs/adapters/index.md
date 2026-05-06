@@ -116,6 +116,12 @@ Run `opencli list` for the live registry.
 | **[crates](./browser/crates.md)**                 | `search` `crate`                                                                                                                               | 🌐 Public    |
 | **[mdn](./browser/mdn.md)**                       | `search`                                                                                                                                       | 🌐 Public    |
 | **[nvd](./browser/nvd.md)**                       | `cve`                                                                                                                                          | 🌐 Public    |
+| **[dockerhub](./browser/dockerhub.md)**           | `search` `image`                                                                                                                               | 🌐 Public    |
+| **[rubygems](./browser/rubygems.md)**             | `search` `gem`                                                                                                                                 | 🌐 Public    |
+| **[homebrew](./browser/homebrew.md)**             | `formula` `cask` `popular`                                                                                                                     | 🌐 Public    |
+| **[packagist](./browser/packagist.md)**           | `search` `package`                                                                                                                             | 🌐 Public    |
+| **[maven](./browser/maven.md)**                   | `search` `artifact`                                                                                                                            | 🌐 Public    |
+| **[openalex](./browser/openalex.md)**             | `search` `work`                                                                                                                                | 🌐 Public    |
 
 ## Desktop Adapters
 
