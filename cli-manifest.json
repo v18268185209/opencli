@@ -22231,8 +22231,74 @@
   },
   {
     "site": "twitter",
+    "name": "bookmark-folder",
+    "description": "Read the tweets inside a single Twitter/X bookmark folder. Get the folder id from `opencli twitter bookmark-folders`.",
+    "access": "read",
+    "domain": "x.com",
+    "strategy": "cookie",
+    "browser": true,
+    "args": [
+      {
+        "name": "folder-id",
+        "type": "string",
+        "required": true,
+        "positional": true,
+        "help": "Folder id from `opencli twitter bookmark-folders`."
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 20,
+        "required": false,
+        "help": "Maximum number of bookmarks to return (default 20)."
+      },
+      {
+        "name": "top-by-engagement",
+        "type": "int",
+        "default": 0,
+        "required": false,
+        "help": "When set to N>0, re-rank the folder by weighted engagement (likes×1 + retweets×3 + replies×2 + bookmarks×5 + log10(views+1)×0.5) and return the top N. Default 0 keeps the API's native (saved-time) ordering."
+      }
+    ],
+    "columns": [
+      "id",
+      "author",
+      "text",
+      "likes",
+      "retweets",
+      "bookmarks",
+      "created_at",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "twitter/bookmark-folder.js",
+    "sourceFile": "twitter/bookmark-folder.js",
+    "navigateBefore": "https://x.com"
+  },
+  {
+    "site": "twitter",
+    "name": "bookmark-folders",
+    "description": "List your Twitter/X bookmark folders (the user-created collections under Bookmarks). Returns folder id, name, item count, and created_at.",
+    "access": "read",
+    "domain": "x.com",
+    "strategy": "cookie",
+    "browser": true,
+    "args": [],
+    "columns": [
+      "id",
+      "name",
+      "items",
+      "created_at"
+    ],
+    "type": "js",
+    "modulePath": "twitter/bookmark-folders.js",
+    "sourceFile": "twitter/bookmark-folders.js",
+    "navigateBefore": "https://x.com"
+  },
+  {
+    "site": "twitter",
     "name": "bookmarks",
-    "description": "Fetch Twitter/X bookmarks",
+    "description": "Fetch your Twitter/X bookmarks (the logged-in user's saved tweets, newest first)",
     "access": "read",
     "domain": "x.com",
     "strategy": "cookie",
@@ -22243,7 +22309,14 @@
         "type": "int",
         "default": 20,
         "required": false,
-        "help": ""
+        "help": "Maximum number of bookmarks to return (default 20)."
+      },
+      {
+        "name": "top-by-engagement",
+        "type": "int",
+        "default": 0,
+        "required": false,
+        "help": "When set to N>0, re-rank the bookmarks by weighted engagement (likes×1 + retweets×3 + replies×2 + bookmarks×5 + log10(views+1)×0.5) and return the top N. Default 0 keeps the API's native (saved-time) ordering."
       }
     ],
     "columns": [
@@ -22290,7 +22363,7 @@
   {
     "site": "twitter",
     "name": "download",
-    "description": "下载 Twitter/X 媒体（图片和视频）",
+    "description": "Download Twitter/X media (images and videos). Provide either <username> to scan a profile's media tab, or --tweet-url to download a single tweet.",
     "access": "read",
     "domain": "x.com",
     "strategy": "cookie",
@@ -22301,27 +22374,27 @@
         "type": "str",
         "required": false,
         "positional": true,
-        "help": "Twitter username (downloads from media tab)"
+        "help": "Twitter username (with or without @) to scan their /media tab. Either <username> or --tweet-url is required."
       },
       {
         "name": "tweet-url",
         "type": "str",
         "required": false,
-        "help": "Single tweet URL to download"
+        "help": "Single tweet URL to download. Use this OR <username>, not both required at once."
       },
       {
         "name": "limit",
         "type": "int",
         "default": 10,
         "required": false,
-        "help": "Number of tweets to scan"
+        "help": "Maximum number of media items to download when scanning a profile (default 10). Ignored when --tweet-url is used."
       },
       {
         "name": "output",
         "type": "str",
         "default": "./twitter-downloads",
         "required": false,
-        "help": "Output directory"
+        "help": "Output directory (default ./twitter-downloads). A per-source subdir is created inside."
       }
     ],
     "columns": [
@@ -22364,7 +22437,7 @@
   {
     "site": "twitter",
     "name": "followers",
-    "description": "Get accounts following a Twitter/X user",
+    "description": "Get accounts following a Twitter/X user (defaults to the logged-in user when no user is given)",
     "access": "read",
     "domain": "x.com",
     "strategy": "ui",
@@ -22382,7 +22455,7 @@
         "type": "int",
         "default": 50,
         "required": false,
-        "help": ""
+        "help": "Maximum number of follower rows to return (default 50). Must be a positive integer."
       }
     ],
     "columns": [
@@ -22398,7 +22471,7 @@
   {
     "site": "twitter",
     "name": "following",
-    "description": "Get accounts a Twitter/X user is following",
+    "description": "Get accounts a Twitter/X user is following (defaults to the logged-in user when no user is given)",
     "access": "read",
     "domain": "x.com",
     "strategy": "cookie",
@@ -22416,7 +22489,7 @@
         "type": "int",
         "default": 50,
         "required": false,
-        "help": ""
+        "help": "Maximum number of following rows to return (default 50). Must be a positive integer."
       }
     ],
     "columns": [
@@ -22485,7 +22558,7 @@
   {
     "site": "twitter",
     "name": "likes",
-    "description": "Fetch liked tweets of a Twitter user",
+    "description": "Fetch liked tweets of a Twitter user (defaults to the logged-in user when no username is given)",
     "access": "read",
     "domain": "x.com",
     "strategy": "cookie",
@@ -22496,14 +22569,21 @@
         "type": "string",
         "required": false,
         "positional": true,
-        "help": "Twitter screen name (without @). Defaults to logged-in user."
+        "help": "Twitter screen name (with or without @). Defaults to the logged-in user when omitted."
       },
       {
         "name": "limit",
         "type": "int",
         "default": 20,
         "required": false,
-        "help": ""
+        "help": "Maximum number of liked tweets to return (default 20)."
+      },
+      {
+        "name": "top-by-engagement",
+        "type": "int",
+        "default": 0,
+        "required": false,
+        "help": "When set to N>0, re-rank the liked tweets by weighted engagement (likes×1 + retweets×3 + replies×2 + bookmarks×5 + log10(views+1)×0.5) and return the top N. Default 0 keeps the API's native (recency) ordering."
       }
     ],
     "columns": [
@@ -22617,6 +22697,13 @@
         "default": 50,
         "required": false,
         "help": ""
+      },
+      {
+        "name": "top-by-engagement",
+        "type": "int",
+        "default": 0,
+        "required": false,
+        "help": "When set to N>0, re-rank the list timeline by weighted engagement (likes×1 + retweets×3 + replies×2 + bookmarks×5 + log10(views+1)×0.5) and return the top N. Default 0 keeps the list's native (recency) ordering."
       }
     ],
     "columns": [
@@ -22648,7 +22735,7 @@
         "type": "int",
         "default": 50,
         "required": false,
-        "help": ""
+        "help": "Maximum number of lists to return (default 50)."
       }
     ],
     "columns": [
@@ -22666,7 +22753,7 @@
   {
     "site": "twitter",
     "name": "notifications",
-    "description": "Get Twitter/X notifications",
+    "description": "Get your Twitter/X notifications (the logged-in user's likes/replies/follows feed, newest first)",
     "access": "read",
     "domain": "x.com",
     "strategy": "intercept",
@@ -22677,7 +22764,7 @@
         "type": "int",
         "default": 20,
         "required": false,
-        "help": ""
+        "help": "Maximum number of notifications to return (default 20)."
       }
     ],
     "columns": [
@@ -22728,7 +22815,7 @@
   {
     "site": "twitter",
     "name": "profile",
-    "description": "Fetch a Twitter user profile (bio, stats, etc.)",
+    "description": "Fetch a Twitter user profile — bio, stats, etc. (defaults to the logged-in user when no username is given)",
     "access": "read",
     "domain": "x.com",
     "strategy": "cookie",
@@ -22739,7 +22826,7 @@
         "type": "string",
         "required": false,
         "positional": true,
-        "help": "Twitter screen name (without @). Defaults to logged-in user."
+        "help": "Twitter screen name (with or without @). Defaults to the logged-in user when omitted."
       }
     ],
     "columns": [
@@ -22763,7 +22850,7 @@
   {
     "site": "twitter",
     "name": "quote",
-    "description": "Quote-tweet a specific tweet with your own text",
+    "description": "Quote-tweet a specific tweet with your own text, optionally with a local or remote image",
     "access": "write",
     "domain": "x.com",
     "strategy": "ui",
@@ -22782,6 +22869,18 @@
         "required": true,
         "positional": true,
         "help": "The text content of your quote"
+      },
+      {
+        "name": "image",
+        "type": "str",
+        "required": false,
+        "help": "Optional local image path to attach to the quote tweet"
+      },
+      {
+        "name": "image-url",
+        "type": "str",
+        "required": false,
+        "help": "Optional remote image URL to download and attach to the quote tweet"
       }
     ],
     "columns": [
@@ -22918,7 +23017,7 @@
   {
     "site": "twitter",
     "name": "search",
-    "description": "Search Twitter/X for tweets",
+    "description": "Search Twitter/X for tweets, with optional --from / --has / --exclude / --product filters mapped to X's search operators",
     "access": "read",
     "domain": "x.com",
     "strategy": "intercept",
@@ -22929,17 +23028,60 @@
         "type": "string",
         "required": true,
         "positional": true,
-        "help": "Twitter/X search query (operators like `from:` and `since:` are supported)"
+        "help": "Search query. Raw X operators (e.g. \"exact phrase\", #tag, OR, lang:en, since:YYYY-MM-DD, from:, since:) are passed through unchanged."
       },
       {
         "name": "filter",
         "type": "string",
         "default": "top",
         "required": false,
-        "help": "",
+        "help": "Legacy alias for --product. Kept for backwards compatibility; if --product is set it wins.",
         "choices": [
           "top",
           "live"
+        ]
+      },
+      {
+        "name": "product",
+        "type": "string",
+        "required": false,
+        "help": "Which X search tab to read: top (default), live (Latest), photos, videos. Maps to the f= URL param.",
+        "choices": [
+          "top",
+          "live",
+          "photos",
+          "videos"
+        ]
+      },
+      {
+        "name": "from",
+        "type": "string",
+        "required": false,
+        "help": "Restrict to tweets authored by <user>. Leading @ is stripped. Equivalent to appending `from:<user>` to the query."
+      },
+      {
+        "name": "has",
+        "type": "string",
+        "required": false,
+        "help": "Restrict to tweets that have media|images|videos|links|replies. Maps to X's `filter:<has>` operator.",
+        "choices": [
+          "media",
+          "images",
+          "videos",
+          "links",
+          "replies"
+        ]
+      },
+      {
+        "name": "exclude",
+        "type": "string",
+        "required": false,
+        "help": "Exclude tweets matching <type>: replies|retweets|media|links. Maps to X's `-filter:<x>` operator (retweets → -filter:nativeretweets).",
+        "choices": [
+          "replies",
+          "retweets",
+          "media",
+          "links"
         ]
       },
       {
@@ -22947,7 +23089,14 @@
         "type": "int",
         "default": 15,
         "required": false,
-        "help": ""
+        "help": "Maximum number of tweets to return (default 15). Result count after server-side filtering."
+      },
+      {
+        "name": "top-by-engagement",
+        "type": "int",
+        "default": 0,
+        "required": false,
+        "help": "When set to N>0, re-rank the results by weighted engagement (likes×1 + retweets×3 + replies×2 + bookmarks×5 + log10(views+1)×0.5) and return the top N. Default 0 keeps X's native ordering."
       }
     ],
     "columns": [
@@ -22988,6 +23137,13 @@
         "default": 50,
         "required": false,
         "help": ""
+      },
+      {
+        "name": "top-by-engagement",
+        "type": "int",
+        "default": 0,
+        "required": false,
+        "help": "When set to N>0, re-rank the thread by weighted engagement (likes×1 + retweets×3 + replies×2 + bookmarks×5 + log10(views+1)×0.5) and return the top N. Default 0 keeps the conversation's structural ordering."
       }
     ],
     "columns": [
@@ -23008,7 +23164,7 @@
   {
     "site": "twitter",
     "name": "timeline",
-    "description": "Fetch Twitter timeline (for-you or following)",
+    "description": "Fetch the logged-in user's home timeline (for-you algorithmic feed by default; pass --type following for the chronological feed of accounts you follow)",
     "access": "read",
     "domain": "x.com",
     "strategy": "cookie",
@@ -23019,7 +23175,7 @@
         "type": "str",
         "default": "for-you",
         "required": false,
-        "help": "Timeline type: for-you (algorithmic) or following (chronological)",
+        "help": "Which home-timeline feed to read. Default for-you (algorithmic). Use following for the chronological feed of accounts you follow.",
         "choices": [
           "for-you",
           "following"
@@ -23030,7 +23186,14 @@
         "type": "int",
         "default": 20,
         "required": false,
-        "help": ""
+        "help": "Maximum number of tweets to return (default 20)."
+      },
+      {
+        "name": "top-by-engagement",
+        "type": "int",
+        "default": 0,
+        "required": false,
+        "help": "When set to N>0, re-rank the timeline by weighted engagement (likes×1 + retweets×3 + replies×2 + bookmarks×5 + log10(views+1)×0.5) and return the top N. Default 0 keeps X's native ordering."
       }
     ],
     "columns": [
@@ -23100,6 +23263,13 @@
         "default": 20,
         "required": false,
         "help": "Max tweets to return"
+      },
+      {
+        "name": "top-by-engagement",
+        "type": "int",
+        "default": 0,
+        "required": false,
+        "help": "When set to N>0, re-rank the tweets by weighted engagement (likes×1 + retweets×3 + replies×2 + bookmarks×5 + log10(views+1)×0.5) and return the top N. Default 0 keeps the chronological ordering."
       }
     ],
     "columns": [

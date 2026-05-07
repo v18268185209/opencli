@@ -1,10 +1,13 @@
+import * as fs from 'node:fs';
 import { CommandExecutionError } from '@jackwener/opencli/errors';
 import { cli, Strategy } from '@jackwener/opencli/registry';
-import { parseTweetUrl } from './shared.js';
-
-function extractTweetId(url) {
-    return parseTweetUrl(url).id;
-}
+import { parseTweetUrl, buildTwitterArticleScopeSource } from './shared.js';
+import {
+    COMPOSER_FILE_INPUT_SELECTOR,
+    attachComposerImage,
+    downloadRemoteImage,
+    resolveImagePath,
+} from './utils.js';
 
 function buildQuoteComposerUrl(url) {
     // Twitter/X quote-tweet compose URL: the `url` param attaches the source
@@ -17,15 +20,8 @@ function buildQuoteComposerUrl(url) {
 async function submitQuote(page, text, tweetId) {
     return page.evaluate(`(async () => {
         try {
+            ${buildTwitterArticleScopeSource(tweetId)}
             const visible = (el) => !!el && (el.offsetParent !== null || el.getClientRects().length > 0);
-            const getStatusId = (href) => {
-                try {
-                    const match = new URL(href, window.location.origin).pathname.match(/^\\/(?:[^/]+|i)\\/status\\/(\\d+)\\/?$/);
-                    return match?.[1] || null;
-                } catch {
-                    return null;
-                }
-            };
             const boxes = Array.from(document.querySelectorAll('[data-testid="tweetTextarea_0"]'));
             const box = boxes.find(visible) || boxes[0];
             if (!box) {
@@ -34,7 +30,6 @@ async function submitQuote(page, text, tweetId) {
 
             box.focus();
             const textToInsert = ${JSON.stringify(text)};
-            const tweetId = ${JSON.stringify(tweetId)};
             // execCommand('insertText') is more reliable with Twitter's Draft.js editor.
             if (!document.execCommand('insertText', false, textToInsert)) {
                 // Fallback to paste event if execCommand fails.
@@ -49,13 +44,16 @@ async function submitQuote(page, text, tweetId) {
 
             await new Promise(r => setTimeout(r, 1000));
 
-            // Confirm the quoted card is rendered before submitting; otherwise we may
-            // accidentally post a plain tweet without the quote attachment.
+            // Confirm the quoted card is rendered before submitting; otherwise
+            // we may accidentally post a plain tweet without the quote
+            // attachment. The compose page does not wrap the card in an
+            // <article>, so we probe the document for any link whose path
+            // exactly matches the requested status id (uses __twHasLinkToTarget
+            // from buildTwitterArticleScopeSource).
             let cardAttempts = 0;
             let hasQuoteCard = false;
             while (cardAttempts < 20) {
-                hasQuoteCard = Array.from(document.querySelectorAll('a[href*="/status/"]'))
-                    .some((link) => getStatusId(link.href) === tweetId);
+                hasQuoteCard = __twHasLinkToTarget(document);
                 if (hasQuoteCard) break;
                 await new Promise(r => setTimeout(r, 250));
                 cardAttempts++;
@@ -102,38 +100,68 @@ cli({
     site: 'twitter',
     name: 'quote',
     access: 'write',
-    description: 'Quote-tweet a specific tweet with your own text',
+    description: 'Quote-tweet a specific tweet with your own text, optionally with a local or remote image',
     domain: 'x.com',
     strategy: Strategy.UI,
     browser: true,
     args: [
         { name: 'url', type: 'string', required: true, positional: true, help: 'The URL of the tweet to quote' },
         { name: 'text', type: 'string', required: true, positional: true, help: 'The text content of your quote' },
+        { name: 'image', help: 'Optional local image path to attach to the quote tweet' },
+        { name: 'image-url', help: 'Optional remote image URL to download and attach to the quote tweet' },
     ],
     columns: ['status', 'message', 'text'],
     func: async (page, kwargs) => {
         if (!page)
             throw new CommandExecutionError('Browser session required for twitter quote');
-
-        // Dedicated composer is more reliable than the inline quote-tweet button.
-        const target = parseTweetUrl(kwargs.url);
-        await page.goto(`https://x.com/compose/post?url=${encodeURIComponent(target.url)}`, { waitUntil: 'load', settleMs: 2500 });
-        await page.wait({ selector: '[data-testid="tweetTextarea_0"]', timeout: 15 });
-
-        const result = await submitQuote(page, kwargs.text, target.id);
-        if (result.ok) {
-            // Wait for network submission to complete
-            await page.wait(3);
+        if (kwargs.image && kwargs['image-url']) {
+            throw new CommandExecutionError('Use either --image or --image-url, not both.');
         }
-        return [{
-                status: result.ok ? 'success' : 'failed',
-                message: result.message,
-                text: kwargs.text,
-            }];
+
+        // Validate URL (typed ArgumentError on malformed/off-domain inputs)
+        // before any browser interaction or remote image download.
+        const target = parseTweetUrl(kwargs.url);
+
+        let localImagePath;
+        let cleanupDir;
+        try {
+            if (kwargs.image) {
+                localImagePath = resolveImagePath(kwargs.image);
+            } else if (kwargs['image-url']) {
+                const downloaded = await downloadRemoteImage(kwargs['image-url']);
+                localImagePath = downloaded.absPath;
+                cleanupDir = downloaded.cleanupDir;
+            }
+
+            // Dedicated composer is more reliable than the inline quote-tweet button.
+            await page.goto(`https://x.com/compose/post?url=${encodeURIComponent(target.url)}`, { waitUntil: 'load', settleMs: 2500 });
+            await page.wait({ selector: '[data-testid="tweetTextarea_0"]', timeout: 15 });
+
+            if (localImagePath) {
+                await page.wait({ selector: COMPOSER_FILE_INPUT_SELECTOR, timeout: 20 });
+                await attachComposerImage(page, localImagePath);
+            }
+
+            const result = await submitQuote(page, kwargs.text, target.id);
+            if (result.ok) {
+                // Wait for network submission to complete
+                await page.wait(3);
+            }
+            return [{
+                    status: result.ok ? 'success' : 'failed',
+                    message: result.message,
+                    text: kwargs.text,
+                    ...(kwargs.image ? { image: kwargs.image } : {}),
+                    ...(kwargs['image-url'] ? { 'image-url': kwargs['image-url'] } : {}),
+                }];
+        } finally {
+            if (cleanupDir) {
+                fs.rmSync(cleanupDir, { recursive: true, force: true });
+            }
+        }
     }
 });
 
 export const __test__ = {
     buildQuoteComposerUrl,
-    extractTweetId,
 };

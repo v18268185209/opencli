@@ -36,6 +36,48 @@ export function parseTweetUrl(rawUrl) {
     };
 }
 
+/**
+ * Build a JS source fragment that, when embedded inside a `page.evaluate(...)`
+ * IIFE, declares browser-side helpers for scoping operations to a specific
+ * tweet by status id. Sibling adapters historically inlined ad-hoc article
+ * lookups that either (a) skipped scoping entirely (silent: act on first
+ * matching button on a conversation page) or (b) used substring matches like
+ * `pathname.includes('/status/' + tweetId)` (silent: `/status/123` matches
+ * `/status/1234567`). This helper centralises the canonical pattern so all
+ * write-actions reuse the same exact-match guard.
+ *
+ * Declared bindings (available to the embedding IIFE):
+ *   - `tweetId`                       : the requested status id (string)
+ *   - `__twGetStatusIdFromHref(href)` : extract status id from a link href, or null
+ *   - `__twHasLinkToTarget(root)`     : true iff `root` contains any link to tweetId
+ *   - `findTargetArticle()`           : the <article> matching tweetId, or undefined
+ */
+export function buildTwitterArticleScopeSource(tweetId) {
+    return `
+        const tweetId = ${JSON.stringify(tweetId)};
+        const __twTweetPathRe = /^\\/(?:[^/]+|i)\\/status\\/(\\d+)\\/?$/;
+        const __twIsTwitterHost = (hostname) => hostname === 'x.com'
+            || hostname === 'twitter.com'
+            || hostname.endsWith('.x.com')
+            || hostname.endsWith('.twitter.com');
+        const __twGetStatusIdFromHref = (href) => {
+            try {
+                const parsed = new URL(href, window.location.origin);
+                if (parsed.protocol !== 'https:' || !__twIsTwitterHost(parsed.hostname.toLowerCase())) {
+                    return null;
+                }
+                return parsed.pathname.match(__twTweetPathRe)?.[1] || null;
+            } catch {
+                return null;
+            }
+        };
+        const __twHasLinkToTarget = (root) => Array.from(root.querySelectorAll('a[href*="/status/"]'))
+            .some((link) => __twGetStatusIdFromHref(link.href) === tweetId);
+        const findTargetArticle = () => Array.from(document.querySelectorAll('article'))
+            .find(__twHasLinkToTarget);
+    `;
+}
+
 export function sanitizeQueryId(resolved, fallbackId) {
     return typeof resolved === 'string' && QUERY_ID_PATTERN.test(resolved) ? resolved : fallbackId;
 }
@@ -103,4 +145,5 @@ export const __test__ = {
     sanitizeQueryId,
     extractMedia,
     parseTweetUrl,
+    buildTwitterArticleScopeSource,
 };

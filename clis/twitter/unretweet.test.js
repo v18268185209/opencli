@@ -24,8 +24,12 @@ describe('twitter unretweet command', () => {
         expect(script).toContain('unretweetBtn.click()');
         expect(script).toContain("document.querySelector('[data-testid=\"unretweetConfirm\"]')");
         expect(script).toContain('confirmBtn.click()');
+        // Article scoping comes from the shared helper (buildTwitterArticleScopeSource):
+        // emits __twHasLinkToTarget + __twGetStatusIdFromHref + the anchored
+        // tweet-path regex. JSDOM-level coverage lives in shared.test.js.
+        expect(script).toContain('__twHasLinkToTarget');
+        expect(script).toContain('__twGetStatusIdFromHref');
         expect(script).toContain("document.querySelectorAll('article')");
-        expect(script).toContain('match?.[1] === tweetId');
         expect(script).toContain("targetArticle?.querySelector('[data-testid=\"unretweet\"]')");
         // Idempotency probe: when already not retweeted ([data-testid="retweet"] present),
         // the script returns ok:true with an "already removed" message.

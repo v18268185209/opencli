@@ -1,6 +1,6 @@
 import { CommandExecutionError } from '@jackwener/opencli/errors';
 import { cli, Strategy } from '@jackwener/opencli/registry';
-import { parseTweetUrl } from './shared.js';
+import { parseTweetUrl, buildTwitterArticleScopeSource } from './shared.js';
 
 cli({
     site: 'twitter',
@@ -22,18 +22,11 @@ cli({
         await page.wait({ selector: '[data-testid="primaryColumn"]' });
         const result = await page.evaluate(`(async () => {
         try {
-            const tweetId = ${JSON.stringify(target.id)};
-            const findTargetArticle = () => Array.from(document.querySelectorAll('article')).find((article) =>
-                Array.from(article.querySelectorAll('a[href*="/status/"]')).some((link) => {
-                    try {
-                        const match = new URL(link.href, window.location.origin).pathname.match(/^\/(?:[^/]+|i)\/status\/(\d+)\/?$/);
-                        return match?.[1] === tweetId;
-                    } catch {
-                        return false;
-                    }
-                })
-            );
-            // Poll for the tweet to render
+            ${buildTwitterArticleScopeSource(target.id)}
+            // Poll for the tweet to render. State probes scoped to the article
+            // matching the requested status id — bare querySelector on a
+            // conversation page would silently grab the first article (e.g.
+            // the parent tweet) and unlike the wrong one.
             let attempts = 0;
             let likeBtn = null;
             let unlikeBtn = null;
