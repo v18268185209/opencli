@@ -1,12 +1,18 @@
 # Changelog
 
-## Unreleased
+## [1.7.17](https://github.com/jackwener/opencli/compare/v1.7.16...v1.7.17) (2026-05-12)
+
+Extension bumped to 1.0.12 (workspace → session lease routing, drop `handleSessions` handler). Major simplification pass: browser/adapter session model rewrite, `--workspace` removed, doctor surface trimmed to its core job.
 
 ### ⚠ BREAKING CHANGES
 
-* **browser session model** — replace the browser-facing `--workspace` model with explicit `--session <name>` on `opencli browser *`. Browser commands now require a session name, `browser bind`/`unbind` use `--session`, and bind no longer accepts `--domain`, `--path-prefix`, or `--allow-navigate-bound`. Browser primitives keep their session tab by design; the browser namespace no longer exposes `--keep-tab`.
-* **adapter site sessions** — replace adapter metadata `browserSession: { reuse: 'site' }` with `siteSession: 'persistent'`, and replace the user override `--reuse <none|site>` / `OPENCLI_BROWSER_REUSE` with `--site-session <ephemeral|persistent>`. Persistent site sessions keep a stable site tab open without idle expiry.
-* **doctor** — remove `--no-live` and `--sessions` flags from `opencli doctor`. Doctor always runs the live browser connectivity probe (that's its core job); session enumeration was never part of health diagnosis. The underlying `'sessions'` daemon protocol action and the `BrowserSessionInfo` public type are removed as dead code.
+* **browser session model** — replace the browser-facing `--workspace` model with explicit `--session <name>` on `opencli browser *`. Browser commands now require a session name, `browser bind`/`unbind` use `--session`, and bind no longer accepts `--domain`, `--path-prefix`, or `--allow-navigate-bound`. Browser primitives keep their session tab by design; the browser namespace no longer exposes `--keep-tab`. ([#1461](https://github.com/jackwener/opencli/issues/1461))
+* **adapter site sessions** — replace adapter metadata `browserSession: { reuse: 'site' }` with `siteSession: 'persistent'`, and replace the user override `--reuse <none|site>` / `OPENCLI_BROWSER_REUSE` with `--site-session <ephemeral|persistent>`. Persistent site sessions keep a stable site tab open without idle expiry. ([#1462](https://github.com/jackwener/opencli/issues/1462))
+* **doctor** — remove `--no-live` and `--sessions` flags from `opencli doctor`. Doctor always runs the live browser connectivity probe (that's its core job); session enumeration was never part of health diagnosis. The underlying `'sessions'` daemon protocol action and the `BrowserSessionInfo` public type are removed as dead code. ([#1470](https://github.com/jackwener/opencli/issues/1470))
+
+### Features
+
+* **chatgpt** — `ask` and `send` now accept local image paths and upload them through the composer before submitting the prompt. ([#1476](https://github.com/jackwener/opencli/issues/1476))
 
 ### Internal
 
