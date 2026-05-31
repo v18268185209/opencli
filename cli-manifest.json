@@ -29884,10 +29884,10 @@
   {
     "site": "xiaohongshu",
     "name": "feed",
-    "description": "小红书首页推荐 Feed (via Pinia Store Action)",
+    "description": "小红书首页推荐 Feed (reads hydrated Pinia store)",
     "access": "read",
     "domain": "www.xiaohongshu.com",
-    "strategy": "intercept",
+    "strategy": "cookie",
     "browser": true,
     "args": [
       {
@@ -29909,7 +29909,7 @@
     "type": "js",
     "modulePath": "xiaohongshu/feed.js",
     "sourceFile": "xiaohongshu/feed.js",
-    "navigateBefore": true
+    "navigateBefore": false
   },
   {
     "site": "xiaohongshu",
